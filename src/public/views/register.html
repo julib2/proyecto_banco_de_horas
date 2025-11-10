@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Banco de Horas - Universidad Pascual Bravo</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <!-- fondo de imagen -->
+    <div class="fondo-imagen"></div>
+
+    <div class="contenedor-login">
+        <!-- logo de la universidad -->
+        <div class="contenedor-logo">
+            <img src="../images/Logo_pascual.png" alt="Logo Universidad Pascual Bravo" class="logo">
+        </div>
+
+        <div class="caja-login">
+            <!-- título -->
+            <h1 class="titulo">Registro</h1>
+
+            <!-- formulario de registro -->
+            <form id="formularioRegistro" class="formulario-login">
+                <!-- campo de nombre -->
+                <input type="text" id="nombre" placeholder="Nombre" required>
+
+                <!-- campo de apellido 1 -->
+                <input type="text" id="apellido1" placeholder="Primer Apellido" required>
+
+                <!-- campo de apellido 2 -->
+                <input type="text" id="apellido2" placeholder="Segundo Apellido" required>
+
+                <!-- selección de tipo de documento -->
+                <div class="seleccion-documento">
+                    <label>
+                        <input type="radio" name="tipoDocumento" value="TI" checked> T.I
+                    </label>
+                    <label>
+                        <input type="radio" name="tipoDocumento" value="CC"> CC
+                    </label>
+                </div>
+
+                <!-- campo de número de documento -->
+                <input type="text" id="numeroDocumento" placeholder="Número de Documento" required disabled>
+
+                <!-- botón de registrarse -->
+                <button type="submit" class="boton-login">Registrarse</button>
+            </form>
+
+            <!-- enlace para volver al login -->
+            <p class="enlace-registro">
+                <a href="login.html">¿Ya tienes cuenta? Inicia sesión aquí</a>
+            </p>
+
+            <!-- mensaje de error -->
+            <div id="mensajeRegistro" class="mensaje"></div>
+        </div>
+    </div>
+
+    <script src="../js/register.js"></script>
+</body>
+</html>
