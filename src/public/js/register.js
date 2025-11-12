@@ -1,8 +1,8 @@
 // elementos del dom
 const formularioRegistro = document.getElementById('formularioRegistro');
 const campoNombre = document.getElementById('nombre');
-const campoApellido1 = document.getElementById('apellido1');
-const campoApellido2 = document.getElementById('apellido2');
+const campoCorreo = document.getElementById('correo');
+const campoContraseña = document.getElementById('contraseña');
 const entradasTipoDocumento = document.querySelectorAll('input[name="tipoDocumento"]');
 const campoNumeroDocumento = document.getElementById('numeroDocumento');
 const divMensajeRegistro = document.getElementById('mensajeRegistro');
@@ -41,25 +41,25 @@ formularioRegistro.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const nombre = campoNombre.value.trim();
-    const apellido1 = campoApellido1.value.trim();
-    const apellido2 = campoApellido2.value.trim();
+    const correo = campoCorreo.value.trim();
+    const contraseña= campoContraseña.value.trim();
     const tipoDocumento = document.querySelector('input[name="tipoDocumento"]:checked')?.value;
     const numeroDocumento = campoNumeroDocumento.value.trim();
 
     // validación básica
-    if (!nombre || !apellido1 || !apellido2 || !tipoDocumento || !numeroDocumento) {
+    if (!nombre || !correo || !contraseña || !tipoDocumento || !numeroDocumento) {
         mostrarMensajeRegistro('Por favor, completa todos los campos.');
         return;
     }
 
     // generar correo y contraseña
-    const correoGenerado = `${nombre.toLowerCase()}.${apellido1.toLowerCase()}@pascual.edu`;
+    const correoGenerado = `${nombre.toLowerCase()}.${correo.toLowerCase()}@pascual.edu`;
     const contrasenaGenerada = numeroDocumento;
 
     try {
         // aquí iría la llamada a la api
         // por ahora, simulamos una respuesta
-        console.log('Intentando registro con:', { nombre, apellido1, apellido2, tipoDocumento, numeroDocumento, correoGenerado, contrasenaGenerada });
+        console.log('Intentando registro con:', { nombre, correo, contraseña, tipoDocumento, numeroDocumento, correoGenerado, contrasenaGenerada });
 
         // mostrar mensaje emergente con las credenciales generadas
         alert(`Su correo generado es (${correoGenerado}) y la contraseña ${contrasenaGenerada}`);

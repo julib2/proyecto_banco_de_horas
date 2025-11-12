@@ -15,7 +15,9 @@ function manejarPublicarTutoria() {
     console.log('Redirigiendo a publicar tutoría');
     // aquí redirigirías a la página de publicar
     // window.location.href = 'publicar.html';
-    alert('Funcionalidad: Publicar tutoría (pendiente de implementar)');
+    console.log('Redirigiendo a publicar tutoría');
+  window.location.href = 'publicar.html';
+    //alert('Funcionalidad: Publicar tutoría (pendiente de implementar)');
 }
 
 // event listeners

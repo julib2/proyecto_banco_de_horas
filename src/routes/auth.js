@@ -5,6 +5,8 @@ const { db } = require('../server');
 
 const router = express.Router();
 
+
+
 // Register
 router.post('/register', async (req, res) => {
   const { username, email, password, pin } = req.body;

@@ -395,4 +395,63 @@ input[type="text"]:focus {
     .titulo-opcion {
         font-size: 20px;
     }
+
+/* formulario de asesoría con estilo igual al login */
+.formulario-publicar h2 {
+  font-size: 28px;
+  color: #061451;
+  margin-bottom: 30px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.inidicadores {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.inputs,
+.selector,
+.texto {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #fdfdfd;
+  transition: border-color 0.3s ease;
+}
+
+.inputs:focus,
+.selector:focus,
+.texto:focus {
+  outline: none;
+  border-color: #061451;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.boton {
+  background: linear-gradient(135deg, #0a28b0 0%, #150970 100%);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.boton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.boton:active {
+  transform: translateY(0);
+}
 }

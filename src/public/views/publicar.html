@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/styles.css">
+    <title>Document</title>
+</head>
+<body>
+     <form action="/registrar-asesoria" method="POST" class="formulario-publicar">
+  <h2>Registrar nueva asesoría</h2>
+
+  <!-- Documento del estudiante -->
+  <label for="estudiante" class="inidicadores">Documento del Estudiante:</label>
+  <input type="text" id="estudiante" class="inputs" ="UsuarioDocumento" required>
+
+  <!-- Categoría -->
+  <label for="categoria" class="inidicadores">Categoría:</label>
+  <select id="categoria" name="CategoriaId" required>
+    <option value="" class="selector">Seleccione una categoría</option>
+    <option value="1">Asignaturas</option>
+    <option value="2">Deportes</option>
+    <option value="3">Arte</option>
+    <!-- Puedes llenar dinámicamente desde la base de datos -->
+  </select>
+
+  <!-- Fecha de la asesoría -->
+  <label for="fecha" class="inidicadores">Fecha de la Asesoría:</label>
+  <input type="datetime-local" class="inputs" id="fecha" name="FechaAsesoria">
+
+  <!-- Horas solicitadas -->
+  <label for="horas" class="inidicadores">Horas Solicitadas:</label>
+  <input type="number" class="inputs" id="horas" name="HorasSolicitadas" min="1" required>
+
+  <!-- Estado -->
+  <label for="estado" class="inidicadores">Estado:</label>
+  <select id="estado" class="selector" name="Estado" required>
+    <option value="Pendiente">Pendiente</option>
+    <option value="Confirmada">Confirmada</option>
+    <option value="Completada">Completada</option>
+  </select>
+
+  <!-- Tema -->
+  <label for="tema" class="inidicadores">Tema o descripción:</label>
+  <textarea id="tema" class="texto" name="Tema" rows="4" placeholder="Describe brevemente el tema de la asesoría..."></textarea>
+
+  <!-- Botón de envío -->
+  <button type="submit" class="boton">Registrar Asesoría</button>
+</form>
+
+</body>
+</html>
