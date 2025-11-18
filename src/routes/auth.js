@@ -1,81 +1,94 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { db } = require('../server');
 
 const router = express.Router();
 
-
-
 // Register
 router.post('/register', async (req, res) => {
-  const { username, email, password, pin } = req.body;
+  const { nombre, apellido, tipoDocumento, numeroDocumento } = req.body;
+
+  console.log('Body recibido:', req.body);
+  console.log('nombre:', nombre, 'tipo:', typeof nombre);
+  console.log('apellido:', apellido, 'tipo:', typeof apellido);
+
+  if (!nombre || !apellido || !numeroDocumento) {
+    return res.status(400).json({ error: 'Faltan campos requeridos' });
+  }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const hashedPin = await bcrypt.hash(pin, 10);
+    // Generar correo y contraseña
+    const nombreCompleto = `${nombre} ${apellido}`;
+    const correoGenerado = `${nombre.toLowerCase()}.${apellido.toLowerCase()}@pascual.edu`;
+    const contrasenaGenerada = numeroDocumento;
 
-    const query = 'INSERT INTO users (username, email, password, pin) VALUES (?, ?, ?, ?)';
-    db.query(query, [username, email, hashedPassword, hashedPin], (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error registering user' });
-      }
-      res.status(201).json({ message: 'User registered successfully' });
+    console.log('Datos procesados:', { nombre, apellido, tipoDocumento, numeroDocumento });
+    console.log('Correo generado:', correoGenerado);
+    console.log('Contraseña generada:', contrasenaGenerada);
+
+    // Insertar en la tabla Usuario (contraseña en texto plano)
+    const query = 'INSERT INTO usuario (documento, nombre, correo, contraseña, cantidadhoras) VALUES ($1, $2, $3, $4, $5)';
+    const values = [numeroDocumento, nombreCompleto, correoGenerado, contrasenaGenerada, 20];
+
+    await req.db.query(query, values);
+
+    res.status(201).json({
+      message: 'Usuario registrado exitosamente',
+      correo: correoGenerado,
+      contraseña: contrasenaGenerada
     });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error al registrar usuario:', error);
+    if (error.code === '23505') { // Violación de unicidad
+      res.status(400).json({ error: 'El documento o correo ya existe' });
+    } else {
+      res.status(500).json({ error: 'Error interno del servidor', details: error.message });
+    }
   }
 });
 
 // Login
-router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+router.post('/login', async (req, res) => {
+  const { usuario, contrasena, rol } = req.body;
 
-  const query = 'SELECT * FROM users WHERE email = ?';
-  db.query(query, [email], async (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Server error' });
+  try {
+    // Construir el correo completo
+    const correo = `${usuario}@pascual.edu`;
+
+    // Buscar usuario por correo
+    const query = 'SELECT documento, nombre, correo, contraseña FROM usuario WHERE correo = $1';
+    const result = await req.db.query(query, [correo]);
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    if (results.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const user = results[0];
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const user = result.rows[0];
+    const isValidPassword = contrasena === user.contraseña;
 
     if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email }, 'secret_key', { expiresIn: '1h' });
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
-  });
-});
+    // Generar token JWT
+    const token = jwt.sign(
+      { documento: user.documento, nombre: user.nombre, correo: user.correo },
+      'secret_key',
+      { expiresIn: '1h' }
+    );
 
-// Verify PIN
-router.post('/verify-pin', (req, res) => {
-  const { email, pin } = req.body;
-
-  const query = 'SELECT pin FROM users WHERE email = ?';
-  db.query(query, [email], async (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Server error' });
-    }
-
-    if (results.length === 0) {
-      return res.status(401).json({ error: 'User not found' });
-    }
-
-    const user = results[0];
-    const isValidPin = await bcrypt.compare(pin, user.pin);
-
-    if (!isValidPin) {
-      return res.status(401).json({ error: 'Invalid PIN' });
-    }
-
-    res.json({ message: 'PIN verified successfully' });
-  });
+    res.json({
+      token,
+      user: {
+        documento: user.documento,
+        nombre: user.nombre,
+        correo: user.correo
+      }
+    });
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error);
+    res.status(500).json({ error: 'Error interno del servidor', details: error.message });
+  }
 });
 
 // Middleware to verify token
@@ -90,19 +103,21 @@ const verifyToken = (req, res, next) => {
     if (err) {
       return res.status(401).json({ error: 'Invalid token' });
     }
-    req.userId = decoded.id;
+    req.userDocumento = decoded.documento;
+    req.userNombre = decoded.nombre;
+    req.userCorreo = decoded.correo;
     next();
   });
 };
 
 // Protected route example
 router.get('/profile', verifyToken, (req, res) => {
-  const query = 'SELECT id, username, email FROM users WHERE id = ?';
-  db.query(query, [req.userId], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Server error' });
+  res.json({
+    user: {
+      documento: req.userDocumento,
+      nombre: req.userNombre,
+      correo: req.userCorreo
     }
-    res.json({ user: results[0] });
   });
 });
 

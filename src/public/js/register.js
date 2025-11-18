@@ -1,8 +1,7 @@
 // elementos del dom
 const formularioRegistro = document.getElementById('formularioRegistro');
 const campoNombre = document.getElementById('nombre');
-const campoCorreo = document.getElementById('correo');
-const campoContraseña = document.getElementById('contraseña');
+const campoApellido = document.getElementById('apellido');
 const entradasTipoDocumento = document.querySelectorAll('input[name="tipoDocumento"]');
 const campoNumeroDocumento = document.getElementById('numeroDocumento');
 const divMensajeRegistro = document.getElementById('mensajeRegistro');
@@ -41,40 +40,48 @@ formularioRegistro.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const nombre = campoNombre.value.trim();
-    const correo = campoCorreo.value.trim();
-    const contraseña= campoContraseña.value.trim();
+    const apellido = campoApellido.value.trim();
     const tipoDocumento = document.querySelector('input[name="tipoDocumento"]:checked')?.value;
     const numeroDocumento = campoNumeroDocumento.value.trim();
 
     // validación básica
-    if (!nombre || !correo || !contraseña || !tipoDocumento || !numeroDocumento) {
+    if (!nombre || !apellido || !tipoDocumento || !numeroDocumento) {
         mostrarMensajeRegistro('Por favor, completa todos los campos.');
         return;
     }
 
-    // generar correo y contraseña
-    const correoGenerado = `${nombre.toLowerCase()}.${correo.toLowerCase()}@pascual.edu`;
-    const contrasenaGenerada = numeroDocumento;
-
     try {
-        // aquí iría la llamada a la api
-        // por ahora, simulamos una respuesta
-        console.log('Intentando registro con:', { nombre, correo, contraseña, tipoDocumento, numeroDocumento, correoGenerado, contrasenaGenerada });
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nombre,
+                apellido,
+                tipoDocumento,
+                numeroDocumento
+            })
+        });
 
-        // mostrar mensaje emergente con las credenciales generadas
-        alert(`Su correo generado es (${correoGenerado}) y la contraseña ${contrasenaGenerada}`);
+        const data = await response.json();
 
-        // simulación de registro exitoso
-        mostrarMensajeRegistro('Registro exitoso. Redirigiendo al login...', 'success');
+        if (response.ok) {
+            // mostrar mensaje emergente con las credenciales generadas
+            alert(`Registro exitoso!\nSu correo generado es: ${data.correo}\nSu contraseña es: ${data.contraseña}`);
 
-        // redirigir al login después de 2 segundos
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 2000);
+            mostrarMensajeRegistro('Registro exitoso. Redirigiendo al login...', 'success');
 
+            // redirigir al login después de 2 segundos
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        } else {
+            mostrarMensajeRegistro(data.error || 'Error al registrarse. Inténtalo de nuevo.');
+        }
     } catch (error) {
         console.error('Error en registro:', error);
-        mostrarMensajeRegistro('Error al registrarse. Inténtalo de nuevo.');
+        mostrarMensajeRegistro('Error de conexión. Inténtalo de nuevo.');
     }
 });
 

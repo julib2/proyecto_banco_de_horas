@@ -15,6 +15,9 @@
         <div class="titulo-header">
             <h1>Banco de Horas</h1>
         </div>
+        <div class="usuario-info" id="usuario-info">
+            <!-- Información del usuario se cargará aquí -->
+        </div>
     </header>
 
     <div class="contenedor-principal">
@@ -45,8 +48,23 @@
         <!-- navegación adicional -->
         <div class="navegacion-secundaria">
             <a href="perfil.html" class="enlace-secundario">Mi Perfil</a>
-            <a href="historial.html" class="enlace-secundario">Historial de Horas</a>
+            <button id="historial-horas" class="enlace-secundario">Historial de Horas</button>
             <a href="login.html" class="enlace-secundario">Cerrar Sesión</a>
+        </div>
+
+        <!-- Modal del historial de horas -->
+        <div id="modal-historial" class="modal">
+            <div class="modal-content">
+                <span class="close" id="cerrar-modal">&times;</span>
+                <h2>Historial de Horas</h2>
+                <div class="botones-historial">
+                    <button id="btn-mis-tutorias" class="boton-historial">Mis Tutorías</button>
+                    <button id="btn-tutorias-tomadas" class="boton-historial">Tutorías Tomadas</button>
+                </div>
+                <div id="contenido-historial" class="contenido-historial">
+                    <!-- Aquí se mostrará el contenido dinámico -->
+                </div>
+            </div>
         </div>
     </div>
 

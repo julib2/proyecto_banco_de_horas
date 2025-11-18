@@ -2,7 +2,6 @@
 const formularioLogin = document.getElementById('formularioLogin');
 const campoCorreo = document.getElementById('correo');
 const campoContrasena = document.getElementById('contrasena');
-const entradasRol = document.querySelectorAll('input[name="rol"]');
 const divMensaje = document.getElementById('mensaje');
 
 // función para mostrar mensajes
@@ -17,23 +16,12 @@ function mostrarMensaje(mensaje, tipo = 'error') {
     }, 5000);
 }
 
-// función para obtener el rol seleccionado
-function obtenerRolSeleccionado() {
-    for (const entradaRol of entradasRol) {
-        if (entradaRol.checked) {
-            return entradaRol.value;
-        }
-    }
-    return 'usuario'; // valor por defecto
-}
-
 // event listener para el formulario de login
 formularioLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const usuario = campoCorreo.value.trim();
     const contrasena = campoContrasena.value;
-    const rol = obtenerRolSeleccionado();
 
     // validación básica
     if (!usuario || !contrasena) {
@@ -41,25 +29,38 @@ formularioLogin.addEventListener('submit', async (e) => {
         return;
     }
 
-    // construir el correo completo
-    const correo = `${usuario}@pascual.edu`;
-
     try {
-        // aquí iría la llamada a la api
-        // por ahora, simulamos una respuesta
-        console.log('Intentando login con:', { correo, contrasena, rol });
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                usuario,
+                contrasena
+            })
+        });
 
-        // simulación de login exitoso
-        mostrarMensaje('Login exitoso. Redirigiendo...', 'success');
+        const data = await response.json();
 
-        // redirigir al index después de un breve delay
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 1000);
+        if (response.ok) {
+            // guardar token en localStorage
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('userDocumento', data.user.documento);
 
+            mostrarMensaje('Login exitoso. Redirigiendo...', 'success');
+
+            // redirigir al index después de un breve delay
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        } else {
+            mostrarMensaje(data.error || 'Error al iniciar sesión. Inténtalo de nuevo.');
+        }
     } catch (error) {
         console.error('Error en login:', error);
-        mostrarMensaje('Error al iniciar sesión. Inténtalo de nuevo.');
+        mostrarMensaje('Error de conexión. Inténtalo de nuevo.');
     }
 });
 

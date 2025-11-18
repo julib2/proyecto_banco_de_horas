@@ -1,52 +1,415 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar Tutoría - Banco de Horas</title>
     <link rel="stylesheet" href="../css/styles.css">
-    <title>Document</title>
+    <style>
+        /* caja centro para el formulario */
+        .caja-centro {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 60vh;
+            padding: 5px;
+            border-radius: 25px;
+            margin: 0px 30px 30px 30px;
+            border: 5px solid #75b8ee;
+            background: transparent;
+        }
+
+        .campo-formulario {
+            margin-bottom: 20px;
+        }
+
+        /* formulario de asesoría con estilo igual al login */
+        .formulario-publicar {
+            background: rgba(255, 255, 255, 0.98);
+            border: 0px solid #87CEEB;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 1000px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* contenedor para campos en fila */
+        .fila-campos {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .campo-mitad {
+            flex: 1;
+        }
+
+        .campo-corto {
+            flex: 0 0 150px;
+        }
+
+        .campo-tercio {
+            flex: 1;
+        }
+
+        .formulario-publicar h2 {
+            font-size: 28px;
+            color: #061451;
+            margin-bottom: 30px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .inidicadores {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .inputs,
+        .selector,
+        .texto {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #ffffff;
+            transition: border-color 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .inputs:focus,
+        .selector:focus,
+        .texto:focus {
+            outline: none;
+            border-color: #87CEEB;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .selector {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23061451" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6,9 12,15 18,9"%3e%3c/polyline%3e%3c/svg%3e');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 45px;
+            cursor: pointer;
+        }
+
+        .texto {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .boton {
+            background: linear-gradient(135deg, #599bd1 0%, #75b8ee 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .boton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .boton:active {
+            transform: translateY(0);
+        }
+
+        /* Estilos para el botón de regresar */
+        .contenedor-boton-regresar {
+            margin: 10px 30px 0px 30px;
+            text-align: left;
+        }
+
+        .boton-regresar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #061451;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 15px;
+            border: 2px solid #061451;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .boton-regresar:hover {
+            background: #061451;
+            color: white;
+            transform: translateX(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <script>
+        // Función para obtener el token del localStorage
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // Función para verificar autenticación
+        async function verificarAutenticacion() {
+            const token = getToken();
+            if (!token) {
+                // Si no hay token, redirigir al login
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': token
+                    }
+                });
+
+                if (!response.ok) {
+                    // Si el token no es válido, redirigir al login
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Error al verificar autenticación:', error);
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticación
+            verificarAutenticacion();
+
+            const categoriaSelect = document.getElementById('categoria');
+            const asignaturaContainer = document.getElementById('asignatura-container');
+            const asignaturaSelect = document.getElementById('asignatura');
+            const deporteContainer = document.getElementById('deporte-container');
+            const deporteSelect = document.getElementById('deporte');
+            const arteContainer = document.getElementById('arte-container');
+            const arteSelect = document.getElementById('arte');
+            const fechaInput = document.getElementById('fecha');
+            const horaInput = document.getElementById('hora');
+
+            // Configurar fecha mínima (hoy)
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            fechaInput.min = today;
+
+            categoriaSelect.addEventListener('change', function() {
+                // Ocultar todos los contenedores
+                asignaturaContainer.style.display = 'none';
+                deporteContainer.style.display = 'none';
+                arteContainer.style.display = 'none';
+                asignaturaSelect.required = false;
+                deporteSelect.required = false;
+                arteSelect.required = false;
+                asignaturaSelect.value = '';
+                deporteSelect.value = '';
+                arteSelect.value = '';
+
+                if (this.value === '1') { // Asignaturas
+                    asignaturaContainer.style.display = 'block';
+                    asignaturaSelect.required = true;
+                } else if (this.value === '2') { // Deportes
+                    deporteContainer.style.display = 'block';
+                    deporteSelect.required = true;
+                } else if (this.value === '3') { // Arte
+                    arteContainer.style.display = 'block';
+                    arteSelect.required = true;
+                }
+            });
+        });
+    </script>
 </head>
 <body>
-     <form action="/registrar-asesoria" method="POST" class="formulario-publicar">
-  <h2>Registrar nueva asesoría</h2>
+    <!-- header -->
+    <header class="header-principal">
+        <div class="contenedor-logo-header">
+            <img src="../images/Logo_pascual.png" alt="Logo Universidad Pascual Bravo" class="logo-header">
+        </div>
+        <div class="titulo-header">
+            <h1>Banco de Horas</h1>
+        </div>
+        <div class="usuario-info" id="usuario-info">
+            <!-- Información del usuario se cargará aquí -->
+        </div>
+    </header>
 
-  <!-- Documento del estudiante -->
-  <label for="estudiante" class="inidicadores">Documento del Estudiante:</label>
-  <input type="text" id="estudiante" class="inputs" ="UsuarioDocumento" required>
+    <!-- Botón de regresar -->
+    <div class="contenedor-boton-regresar">
+        <a href="/views/index.html" class="boton-regresar">
+            ← Regresar
+        </a>
+    </div>
 
-  <!-- Categoría -->
-  <label for="categoria" class="inidicadores">Categoría:</label>
-  <select id="categoria" name="CategoriaId" required>
-    <option value="" class="selector">Seleccione una categoría</option>
-    <option value="1">Asignaturas</option>
-    <option value="2">Deportes</option>
-    <option value="3">Arte</option>
-    <!-- Puedes llenar dinámicamente desde la base de datos -->
-  </select>
+    <div class="contenedor-principal">
+        <div class="caja-centro">
+            <form id="form-publicar" class="formulario-publicar">
+                <h2>Registrar nueva asesoría</h2>
 
-  <!-- Fecha de la asesoría -->
-  <label for="fecha" class="inidicadores">Fecha de la Asesoría:</label>
-  <input type="datetime-local" class="inputs" id="fecha" name="FechaAsesoria">
+                <div class="fila-campos">
+                    <div class="campo-tercio">
+                        <label for="estudiante" class="inidicadores">Documento del Estudiante:</label>
+                        <input type="text" id="estudiante" class="inputs" name="UsuarioDocumento" required>
+                    </div>
+                    <div class="campo-tercio">
+                        <label for="categoria" class="inidicadores">Categoría:</label>
+                        <select id="categoria" name="CategoriaId" class="selector" required>
+                            <option value="">Seleccione una categoría</option>
+                            <option value="1">Asignaturas</option>
+                            <option value="2">Deportes</option>
+                            <option value="3">Arte</option>
+                            <!-- Puedes llenar dinámicamente desde la base de datos -->
+                        </select>
+                    </div>
+                    <div class="campo-tercio" id="asignatura-container" style="display: none;">
+                        <label for="asignatura" class="inidicadores">Asignatura:</label>
+                        <select id="asignatura" name="Asignatura" class="selector">
+                            <option value="">Seleccione una asignatura</option>
+                            <option value="Cálculo Integral">Cálculo Integral</option>
+                            <option value="Cálculo Diferencial">Cálculo Diferencial</option>
+                            <option value="Física">Física</option>
+                            <option value="Programación">Programación</option>
+                            <option value="Matemáticas">Matemáticas</option>
+                            <option value="Química">Química</option>
+                            <option value="Biología">Biología</option>
+                            <option value="Historia">Historia</option>
+                            <option value="Literatura">Literatura</option>
+                            <option value="Inglés">Inglés</option>
+                            <option value="Economía">Economía</option>
+                            <option value="Estadística">Estadística</option>
+                        </select>
+                    </div>
+                    <div class="campo-tercio" id="deporte-container" style="display: none;">
+                        <label for="deporte" class="inidicadores">Deporte:</label>
+                        <select id="deporte" name="Deporte" class="selector">
+                            <option value="">Seleccione un deporte</option>
+                            <option value="Voleibol">Voleibol</option>
+                            <option value="Fútbol">Fútbol</option>
+                            <option value="Fútbol Sala">Fútbol Sala</option>
+                            <option value="Basketball">Basketball</option>
+                        </select>
+                    </div>
+                    <div class="campo-tercio" id="arte-container" style="display: none;">
+                        <label for="arte" class="inidicadores">Arte:</label>
+                        <select id="arte" name="Arte" class="selector">
+                            <option value="">Seleccione un arte</option>
+                            <option value="Guitarra">Guitarra</option>
+                            <option value="Piano">Piano</option>
+                            <option value="Tecnica-vocal">Técnica Vocal</option>
+                            <option value="Guitarra-electrica">Guitarra Eléctrica</option>
+                            <option value="Violín">Violín</option>
+                            <option value="Flauta">Flauta</option>
+                            <option value="Batería">Batería</option>
+                            <option value="Pintura">Pintura</option>
+                            <option value="Danza">Danza</option>
+                            <option value="Teatro">Teatro</option>
+                        </select>
+                    </div>
+                    <div class="campo-tercio">
+                        <label for="fecha" class="inidicadores">Fecha de la Asesoría:</label>
+                        <input type="date" class="inputs" id="fecha" name="Fecha" required>
+                    </div>
+                    <div class="campo-tercio">
+                        <label for="hora" class="inidicadores">Hora de la Asesoría:</label>
+                        <input type="time" class="inputs" id="hora" name="Hora" required step="3600" min="06:00" max="22:00">
+                    </div>
+                </div>
 
-  <!-- Horas solicitadas -->
-  <label for="horas" class="inidicadores">Horas Solicitadas:</label>
-  <input type="number" class="inputs" id="horas" name="HorasSolicitadas" min="1" required>
+                <div class="fila-campos">
+                    <div class="campo-mitad">
+                        <label for="estado" class="inidicadores">Estado:</label>
+                        <select id="estado" name="Estado" class="selector" required>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Confirmada">Confirmada</option>
+                            <option value="Completada">Completada</option>
+                        </select>
+                    </div>
+                    <div class="campo-corto">
+                        <label for="horas" class="inidicadores">Horas Solicitadas:</label>
+                        <input type="number" class="inputs" id="horas" name="HorasSolicitadas" min="1" required>
+                    </div>
+                </div>
 
-  <!-- Estado -->
-  <label for="estado" class="inidicadores">Estado:</label>
-  <select id="estado" class="selector" name="Estado" required>
-    <option value="Pendiente">Pendiente</option>
-    <option value="Confirmada">Confirmada</option>
-    <option value="Completada">Completada</option>
-  </select>
+                <div class="campo-formulario">
+                    <label for="tema" class="inidicadores">Tema o descripción:</label>
+                    <textarea id="tema" class="texto" name="Tema" rows="4" placeholder="Describe brevemente el tema de la asesoría..." required></textarea>
+                </div>
 
-  <!-- Tema -->
-  <label for="tema" class="inidicadores">Tema o descripción:</label>
-  <textarea id="tema" class="texto" name="Tema" rows="4" placeholder="Describe brevemente el tema de la asesoría..."></textarea>
+                <div class="campo-formulario">
+                    <button type="submit" class="boton">Registrar Asesoría</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-  <!-- Botón de envío -->
-  <button type="submit" class="boton">Registrar Asesoría</button>
-</form>
+    <script>
+        // Función para enviar el formulario
+        document.getElementById('form-publicar').addEventListener('submit', async function(e) {
+            e.preventDefault();
 
+            const token = getToken();
+            if (!token) {
+                alert('No hay token de autenticación. Inicia sesión nuevamente.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/tutorias/registrar-asesoria', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Asesoría registrada exitosamente');
+                    window.location.href = 'index.html';
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.error || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al registrar la asesoría');
+            }
+        });
+    </script>
+    <script src="../js/user-info.js"></script>
+    <script src="../js/index.js"></script>
 </body>
 </html>

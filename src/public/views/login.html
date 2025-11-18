@@ -22,24 +22,14 @@
 
             <!-- formulario de login -->
             <form id="formularioLogin" class="formulario-login">
-                <!-- selección de rol -->
-                <div class="seleccion-rol">
-                    <label>
-                        <input type="radio" name="rol" value="usuario" checked> Usuario
-                    </label>
-                    <label>
-                        <input type="radio" name="rol" value="administrador"> Administrador
-                    </label>
-                </div>
-
                 <!-- campo de correo -->
                 <div class="campo-correo">
-                    <input type="text" id="correo" placeholder="usuario" required>
+                    <input type="text" id="correo" placeholder="nombre.apellido" required>
                     <span class="dominio">@pascual.edu</span>
                 </div>
 
                 <!-- campo de contraseña -->
-                <input type="password" id="contrasena" placeholder="Contraseña" required>
+                <input type="password" id="contrasena" placeholder="Contraseña (número de documento)" required>
 
             <!-- botón de iniciar sesión -->
             <button type="submit" class="boton-login">Iniciar Sesión</button>
