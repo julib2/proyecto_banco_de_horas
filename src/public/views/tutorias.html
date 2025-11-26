@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutorías Disponibles - Banco de Horas</title>
+    <title>Asesorías Disponibles - Banco de Horas</title>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
         /* caja centro para el listado */
         .caja-centro {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 60vh;
-    padding: 5px;
-    border-radius: 25px;
-    margin: 0px 0px 50px 0px;
-    border: 5px solid #75b8ee;
-    background: transparent;
-    width: 90vw;
-    position: relative;
-}
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 60vh;
+            padding: 5px;
+            border-radius: 25px;
+            margin: 0px 0px 50px 0px;
+            border: 5px solid #75b8ee;
+            background: transparent;
+            width: 90vw;
+            position: relative;
+        }
 
-
-        .listado-tutorias {
+        .listado-asesorias {
             background: rgba(255, 255, 255, 0.98);
-            border: 0px solid #87CEEB;
             border-radius: 15px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             padding: 40px;
             width: 100%;
             max-width: 100%;
+            max-height: 70vh;
+            overflow-y: auto;
             animation: fadeIn 0.5s ease-in-out;
             display: flex;
             flex-wrap: wrap;
@@ -58,7 +58,7 @@
             border-color: #599bd1;
         }
 
-        .listado-tutorias h2 {
+        .listado-asesorias h2 {
             font-size: 28px;
             color: #061451;
             margin-bottom: 30px;
@@ -67,7 +67,7 @@
             width: 100%;
         }
 
-        .tutoria-item {
+        .asesoria-item {
             border: 1px solid #e1e5e9;
             border-radius: 10px;
             padding: 20px;
@@ -79,24 +79,24 @@
             box-sizing: border-box;
         }
 
-        .tutoria-item:hover {
+        .asesoria-item:hover {
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .tutoria-header {
+        .asesoria-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
 
-        .tutoria-tema {
+        .asesoria-tema {
             font-size: 20px;
             font-weight: bold;
             color: #061451;
         }
 
-        .tutoria-estado {
+        .asesoria-estado {
             padding: 5px 10px;
             border-radius: 5px;
             font-size: 14px;
@@ -108,7 +108,7 @@
             color: #856404;
         }
 
-        .tutoria-detalles {
+        .asesoria-detalles {
             margin-bottom: 15px;
         }
 
@@ -122,13 +122,13 @@
             color: #333;
         }
 
-        .tutoria-descripcion {
+        .asesoria-descripcion {
             font-size: 16px;
             color: #666;
             margin-bottom: 15px;
         }
 
-        .tutoria-acciones {
+        .asesoria-acciones {
             text-align: right;
         }
 
@@ -150,7 +150,6 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
 
-        /* Estilos para el botón de regresar */
         .contenedor-boton-regresar {
             margin: 10px 30px 0px 30px;
             text-align: left;
@@ -180,24 +179,18 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .no-tutorias {
+        .no-asesorias {
             text-align: center;
             font-size: 18px;
             color: #666;
             padding: 40px;
         }
 
-        #tutorias-container {
+        #asesorias-container {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
@@ -205,7 +198,7 @@
             justify-content: flex-start;
         }
 
-        .tutoria-own {
+        .asesoria-own {
             text-align: center;
             font-weight: bold;
             color: #3a8cfe;
@@ -213,17 +206,13 @@
             margin-top: 10px;
         }
 
-        /* Estilos para el modal */
         .modal {
             display: none;
             position: fixed;
             z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
             overflow: auto;
-            background-color: rgb(0,0,0);
             background-color: rgba(0,0,0,0.4);
         }
 
@@ -232,8 +221,7 @@
             margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
-            max-width: 600px;
+            width: 80%; max-width: 600px;
             border-radius: 10px;
         }
 
@@ -250,321 +238,255 @@
             text-decoration: none;
             cursor: pointer;
         }
+
     </style>
 </head>
 <body>
-    <!-- header -->
-    <header class="header-principal">
-        <div class="contenedor-logo-header">
-            <img src="../images/Logo_pascual.png" alt="Logo Universidad Pascual Bravo" class="logo-header">
-        </div>
-        <div class="titulo-header">
-            <h1>Banco de Horas</h1>
-        </div>
-        <div class="usuario-info" id="usuario-info">
-            <!-- Información del usuario se cargará aquí -->
-        </div>
-    </header>
-
-    <!-- Botón de regresar -->
-    <div class="contenedor-boton-regresar">
-        <a href="/views/index.html" class="boton-regresar">
-            ← Regresar
-        </a>
+<header class="header-principal">
+    <div class="contenedor-logo-header">
+        <img src="../images/Logo_pascual.png" alt="Logo Universidad Pascual Bravo" class="logo-header">
     </div>
+    <div class="titulo-header">
+        <h1>Banco de Horas</h1>
+    </div>
+   
+    <div class="usuario-info" id="usuario-info"></div>
+</header>
 
-    <div class="contenedor-principal">
-        <div class="caja-centro">
-            <div class="listado-tutorias">
-                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 30px;">
-                    <h2>Tutorías Disponibles</h2>
-                    <button id="btn-mis-tutorias" class="boton-accion" style="margin: 0;">Mis Tutorías</button>
-                </div>
-                <div class="search-container">
-                    <input type="text" id="search-input" class="search-input" placeholder="Buscar por tema, estudiante o categoría...">
-                </div>
-                <div id="tutorias-container">
-                    <!-- Las tutorías se cargarán aquí dinámicamente -->
-                    <p class="no-tutorias">Cargando tutorías...</p>
-                </div>
+<div class="contenedor-boton-regresar">
+    <a href="/views/index.html" class="boton-regresar">← Regresar</a>
+</div>
+
+<div class="contenedor-principal">
+    <div class="caja-centro">
+        <div class="listado-asesorias">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 30px;">
+                <h2>Asesorías Disponibles</h2>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Buscar por tema, estudiante o categoría...">
+            </div>
+            <div id="asesorias-container">
+                <p class="no-asesorias">Cargando asesorías...</p>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal para mostrar tutorías -->
-    <div id="modal-historial" class="modal">
-        <div class="modal-content">
-            <span class="close" id="cerrar-modal">&times;</span>
-            <h2>Mis Tutorías</h2>
-            <div id="contenido-historial"></div>
-        </div>
+<div id="modal-historial" class="modal">
+    <div class="modal-content">
+        <span class="close" id="cerrar-modal">&times;</span>
+        <h2>Mis Asesorías</h2>
+        <div id="contenido-historial"></div>
     </div>
+</div>
 
-    <script>
-        // Obtener el documento del usuario actual
-        let currentUserDocumento = localStorage.getItem('userDocumento');
-        if (!currentUserDocumento) {
-            const token = localStorage.getItem('token');
-            if (token) {
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    currentUserDocumento = payload.documento;
-                } catch (e) {
-                    console.error('Error decodificando token:', e);
-                }
-            }
-        }
+<script>
+let currentUserDocumento = localStorage.getItem('userDocumento');
+if (!currentUserDocumento) {
+    const token = localStorage.getItem('token');
+    if (token) {
+        try { const payload = JSON.parse(atob(token.split('.')[1])); currentUserDocumento = payload.documento; }
+        catch (e) { console.error('Error decodificando token:', e); }
+    }
+}
 
-        // Función para normalizar los datos de la tutoría
-        function normalizarTutoria(t) {
-            return {
-                id: t.id,
-                usuarioDocumento: t.usuariodocumento,
-                tutorDocumento: t.tutordocumento,
-                categoriaId: t.categoriaid,
-                categoriaNombre: t.categorianombre,
-                fechaAsesoria: t.fechaasesoria,
-                horasSolicitadas: t.horassolicitadas,
-                estado: t.estado,
-                tema: t.tema,
-                estudiantenombre: t.estudiantenombre,
-                tutornombre: t.tutornombre
-            };
-        }
+function normalizarAsesoria(a) {
+    return {
+        id: a.id,
+        usuarioDocumento: a.usuariodocumento,
+        tutorDocumento: a.tutordocumento,
+        categoriaId: a.categoriaid,
+        categoriaNombre: a.categorianombre || 'Sin categoría', // fallback
+        fechaAsesoria: a.fechaasesoria ? new Date(a.fechaasesoria).toLocaleString() : 'Fecha no disponible', // parse date
+        horasSolicitadas: a.horassolicitadas,
+        estado: a.estado,
+        tema: a.tema,
+        estudiantenombre: a.estudiantenombre,
+        tutornombre: a.tutornombre
+    };
+}
 
-        // Función para cargar las tutorías desde el servidor
-        async function cargarTutorias() {
-            try {
-                const response = await fetch('/api/tutorias/pendientes');
-
-                if (response.ok) {
-                    const tutorias = await response.json();
-                    const tutoriasNormalizadas = tutorias.map(normalizarTutoria);
-                    mostrarTutorias(tutoriasNormalizadas);
-                } else {
-                    console.error('Error al cargar tutorías:', response.statusText);
-                    document.getElementById('tutorias-container').innerHTML = '<p class="no-tutorias">Error al cargar las tutorías. Inténtalo de nuevo más tarde.</p>';
-                }
-            } catch (error) {
-                console.error('Error de red:', error);
-                document.getElementById('tutorias-container').innerHTML = '<p class="no-tutorias">Error de conexión. Verifica tu conexión a internet.</p>';
-            }
-        }
-
-        // Función para mostrar las tutorías en el DOM
-        function mostrarTutorias(tutorias) {
-            const container = document.getElementById('tutorias-container');
-
-            if (tutorias.length === 0) {
-                container.innerHTML = '<p class="no-tutorias">No hay tutorías pendientes disponibles en este momento.</p>';
-                return;
-            }
-
-            container.innerHTML = '';
-
-            tutorias.forEach(tutoria => {
-
-                const tutoriaElement = document.createElement('div');
-                tutoriaElement.className = 'tutoria-item';
-
-                // 🔥 Manejo seguro de Estado
-                const estado = ((tutoria.Estado || "Pendiente") + "").toLowerCase();
-                const estadoClass = estado === "pendiente" ? "estado-pendiente" : "";
-
-                const isOwnTutoria = tutoria.tutorDocumento === currentUserDocumento;
-
-                tutoriaElement.innerHTML = `
-                    <div class="tutoria-header">
-                        <div class="tutoria-tema">${tutoria.tema || 'Sin tema'}</div>
-                        <div class="tutoria-estado ${estadoClass}">${tutoria.estado || 'Pendiente'}</div>
-                    </div>
-                    <div class="tutoria-detalles">
-                        ${isOwnTutoria ? `<div class="detalle-item"><span class="detalle-label">Tutoría subida por mí</span></div>` : `<div class="detalle-item"><span class="detalle-label">Tutor:</span> ${tutoria.tutornombre || 'N/A'}</div>`}
-                        <div class="detalle-item"><span class="detalle-label">Categoría:</span> ${tutoria.categoriaNombre || 'N/A'}</div>
-                        <div class="detalle-item"><span class="detalle-label">Fecha:</span> ${tutoria.fechaAsesoria ? new Date(tutoria.fechaAsesoria).toLocaleString() : 'N/A'}</div>
-                        <div class="detalle-item"><span class="detalle-label">Horas Solicitadas:</span> ${tutoria.horasSolicitadas || 0}</div>
-                    </div>
-                    <div class="tutoria-descripcion">${tutoria.tema || ''}</div>
-                    ${isOwnTutoria ? `<div class="tutoria-own">Tutoría subida por mí</div>` : `<div class="tutoria-acciones">
-                        <button class="boton-accion" onclick="confirmarTutoria(${tutoria.id})">Confirmar</button>
-                        <button class="boton-accion" onclick="rechazarTutoria(${tutoria.id})">Rechazar</button>
-                    </div>`}
-                `;
-
-                container.appendChild(tutoriaElement);
+async function cargarAsesorias() {
+    try {
+            const response = await fetch('/api/asesorias/tutorias/pendientes', {
+                headers: { 'Authorization': localStorage.getItem('token') }
             });
+        if (response.ok) {
+        const asesoriasJson = await response.json();
+
+        // Debug log to check received asesorias data
+        console.log('Received asesorias:', asesoriasJson);
+
+        mostrarAsesorias(asesoriasJson.map(normalizarAsesoria));
+        } else {
+            console.error('Error al cargar asesorías:', response.statusText);
+            document.getElementById('asesorias-container').innerHTML = '<p class="no-asesorias">Error al cargar las asesorías. Inténtalo de nuevo más tarde.</p>';
         }
+    } catch (error) {
+        console.error('Error de red:', error);
+        document.getElementById('asesorias-container').innerHTML = '<p class="no-asesorias">Error de conexión. Verifica tu conexión a internet.</p>';
+    }
+}
 
-        // Función para confirmar una tutoría
-        async function confirmarTutoria(id) {
-            if (confirm('¿Estás seguro de que quieres confirmar esta tutoría?')) {
-                try {
-                    const response = await fetch(`/api/tutorias/tutorias/${id}/confirmar`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
+function mostrarAsesorias(asesorias) {
+    const container = document.getElementById('asesorias-container');
+    if (asesorias.length === 0) { container.innerHTML = '<p class="no-asesorias">No hay asesorías pendientes disponibles en este momento.</p>'; return; }
+    container.innerHTML = '';
+    asesorias.forEach(a => {
+        const asesoriaElement = document.createElement('div');
+        asesoriaElement.className = 'asesoria-item';
+        const estado = ((a.estado || "Pendiente") + "").toLowerCase();
+        const estadoClass = estado === "pendiente" ? "estado-pendiente" : "";
+        const isOwn = a.usuarioDocumento === currentUserDocumento;
 
-                    if (response.ok) {
-                        alert('Tutoría confirmada exitosamente.');
-                        cargarTutorias(); // Recargar la lista
-                    } else {
-                        alert('Error al confirmar la tutoría.');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Error de conexión.');
-                }
-            }
-        }
+        asesoriaElement.innerHTML = `
+            <div class="asesoria-header">
+                <div class="asesoria-tema">${a.tema || 'Sin tema'}</div>
+                <div class="asesoria-estado ${estadoClass}">${a.estado || 'Pendiente'}</div>
+            </div>
+            <div class="asesoria-detalles">
+            ${isOwn ? `<div class="detalle-item"><span class="detalle-label">Asesoría subida por mí</span></div>` : `<div class="detalle-item"><span class="detalle-label">Tutor:</span> ${a.tutornombre || 'N/A'}</div>`}
+            <div class="detalle-item"><span class="detalle-label">Categoría:</span> ${a.categoriaNombre}</div>
+            <div class="detalle-item"><span class="detalle-label">Fecha:</span> ${a.fechaAsesoria}</div>
+            <div class="detalle-item"><span class="detalle-label">Horas Solicitadas:</span> ${a.horasSolicitadas}</div>
+        </div>
+        <div class="asesoria-descripcion">${a.tema || ''}</div>
+        ${isOwn ? `<div class="asesoria-own">Asesoría subida por mí</div>` : `<div class="asesoria-acciones">
+            <button class="boton-accion" onclick="confirmarAsesoria(${a.id})">Solicitar</button>
+        </div>`}
+        `;
+        container.appendChild(asesoriaElement);
+    });
+}
 
-        // Función para rechazar una tutoría
-        async function rechazarTutoria(id) {
-            if (confirm('¿Estás seguro de que quieres rechazar esta tutoría?')) {
-                try {
-                    const response = await fetch(`/api/tutorias/tutorias/${id}/rechazar`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (response.ok) {
-                        alert('Tutoría rechazada.');
-                        cargarTutorias(); // Recargar la lista
-                    } else {
-                        alert('Error al rechazar la tutoría.');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Error de conexión.');
-                }
-            }
-        }
-
-        // Función para filtrar tutorías
-        function filtrarTutorias() {
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const tutorias = document.querySelectorAll('.tutoria-item');
-
-            tutorias.forEach(tutoria => {
-                const tema = tutoria.querySelector('.tutoria-tema').textContent.toLowerCase();
-                const estudiante = tutoria.querySelector('.detalle-item:nth-child(1)').textContent.toLowerCase();
-                const categoria = tutoria.querySelector('.detalle-item:nth-child(2)').textContent.toLowerCase();
-
-                if (tema.includes(searchTerm) || estudiante.includes(searchTerm) || categoria.includes(searchTerm)) {
-                    tutoria.style.display = 'block';
-                } else {
-                    tutoria.style.display = 'none';
+async function confirmarAsesoria(id) {
+    if(confirm('¿Estás seguro de que quieres confirmar esta asesoría?')){
+        try{
+            const response = await fetch(`/api/asesorias/tutorias/${id}/confirmar`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('token')
                 }
             });
-        }
+            if(response.ok){ alert('Asesoría confirmada exitosamente.'); cargarAsesorias(); }
+            else alert('Error al confirmar la asesoría.');
+        }catch(e){ console.error(e); alert('Error de conexión.'); }
+    }
+}
 
-        // Función para cargar mis tutorías (como tutor)
-        async function cargarMisTutorias() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert('No hay token de autenticación. Inicia sesión nuevamente.');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/tutorias/mis-tutorias', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': token
-                    }
-                });
-
-                if (response.ok) {
-                    const tutorias = await response.json();
-                    mostrarMisTutorias(tutorias);
-                } else {
-                    console.error('Error al cargar mis tutorías:', response.statusText);
-                    document.getElementById('tutorias-container').innerHTML = '<p class="no-tutorias">Error al cargar tus tutorías. Inténtalo de nuevo más tarde.</p>';
-                }
-            } catch (error) {
-                console.error('Error de red:', error);
-                document.getElementById('tutorias-container').innerHTML = '<p class="no-tutorias">Error de conexión. Verifica tu conexión a internet.</p>';
-            }
-        }
-
-        // Función para mostrar mis tutorías
-        function mostrarMisTutorias(tutorias) {
-            const container = document.getElementById('contenido-historial');
-
-            if (tutorias.length === 0) {
-                container.innerHTML = '<p class="no-tutorias">No tienes tutorías registradas.</p>';
-                return;
-            }
-
-            container.innerHTML = '';
-
-            tutorias.forEach(tutoria => {
-                const tutoriaElement = document.createElement('div');
-                tutoriaElement.className = 'tutoria-item';
-
-                const estado = ((tutoria.estado || "Pendiente") + "").toLowerCase();
-                const estadoClass = estado === "pendiente" ? "estado-pendiente" : "";
-
-                tutoriaElement.innerHTML = `
-                    <div class="tutoria-header">
-                        <div class="tutoria-tema">${tutoria.tema || 'Sin tema'}</div>
-                        <div class="tutoria-estado ${estadoClass}">${tutoria.estado || 'Pendiente'}</div>
-                    </div>
-                    <div class="tutoria-detalles">
-                        <div class="detalle-item"><span class="detalle-label">Tutoría subida por mí</span></div>
-                        <div class="detalle-item"><span class="detalle-label">Estudiante:</span> ${tutoria.estudiantenombre || 'N/A'}</div>
-                        <div class="detalle-item"><span class="detalle-label">Categoría:</span> ${tutoria.categorianombre || 'N/A'}</div>
-                        <div class="detalle-item"><span class="detalle-label">Fecha:</span> ${tutoria.fechaasesoria ? new Date(tutoria.fechaasesoria).toLocaleString() : 'N/A'}</div>
-                        <div class="detalle-item"><span class="detalle-label">Horas Solicitadas:</span> ${tutoria.horassolicitadas || 0}</div>
-                    </div>
-                    <div class="tutoria-own">Tutoría subida por mí</div>
-                `;
-
-                container.appendChild(tutoriaElement);
-            });
-        }
-
-        // Función para abrir el modal del historial
-        function abrirModalHistorial() {
-            const modal = document.getElementById('modal-historial');
-            modal.style.display = 'block';
-            cargarMisTutorias();
-        }
-
-        // Función para cerrar el modal del historial
-        function cerrarModalHistorial() {
-            const modal = document.getElementById('modal-historial');
-            modal.style.display = 'none';
-        }
-
-        // Cargar tutorías cuando la página se carga
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarTutorias();
-
-            // Agregar evento de búsqueda
-            document.getElementById('search-input').addEventListener('input', filtrarTutorias);
-
-        // Agregar evento al botón "Mis Tutorías"
-            document.getElementById('btn-mis-tutorias').addEventListener('click', abrirModalHistorial);
-
-            // Agregar evento al botón de cerrar modal
-            document.getElementById('cerrar-modal').addEventListener('click', cerrarModalHistorial);
-
-            // Cerrar modal al hacer clic fuera de él
-            window.addEventListener('click', function(event) {
-                const modalHistorial = document.getElementById('modal-historial');
-                if (event.target === modalHistorial) {
-                    cerrarModalHistorial();
+async function rechazarAsesoria(id) {
+    if(confirm('¿Estás seguro de que quieres rechazar esta asesoría?')){
+        try{
+            const response = await fetch(`/api/asesorias/tutorias/${id}/rechazar`, {
+                method:'PUT',
+                headers: {
+                    'Content-Type':'application/json',
+                    'Authorization': localStorage.getItem('token')
                 }
             });
+            if(response.ok){ alert('Asesoría rechazada.'); cargarAsesorias(); }
+            else alert('Error al rechazar la asesoría.');
+        }catch(e){ console.error(e); alert('Error de conexión.'); }
+    }
+}
+
+function filtrarAsesorias() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const asesorias = document.querySelectorAll('.asesoria-item');
+    asesorias.forEach(a => {
+        const tema = a.querySelector('.asesoria-tema').textContent.toLowerCase();
+        const estudiante = a.querySelector('.detalle-item:nth-child(1)').textContent.toLowerCase();
+        const categoria = a.querySelector('.detalle-item:nth-child(2)').textContent.toLowerCase();
+        a.style.display = (tema.includes(searchTerm) || estudiante.includes(searchTerm) || categoria.includes(searchTerm)) ? 'block':'none';
+    });
+}
+
+async function cargarMisAsesorias() {
+    const token = localStorage.getItem('token');
+    if(!token){ alert('No hay token de autenticación. Inicia sesión nuevamente.'); window.location.href='login.html'; return; }
+    try{
+        const response = await fetch('/api/asesorias/tutorias/mis-tutorias', {
+            method: 'GET',
+            headers: {'Authorization': token}
+        });
+        if(response.ok){ mostrarMisAsesorias(await response.json()); }
+        else{ console.error('Error al cargar mis asesorías'); document.getElementById('asesorias-container').innerHTML='<p class="no-asesorias">Error al cargar tus asesorías.</p>'; }
+    }catch(e){ console.error(e); document.getElementById('asesorias-container').innerHTML='<p class="no-asesorias">Error de conexión.</p>'; }
+}
+
+function mostrarMisAsesorias(asesorias){
+    const container = document.getElementById('contenido-historial');
+    if(asesorias.length===0){ container.innerHTML='<p class="no-asesorias">No tienes asesorías registradas.</p>'; return; }
+    container.innerHTML='';
+    asesorias.forEach(a=>{
+        const asesoriaElement = document.createElement('div');
+        asesoriaElement.className='asesoria-item';
+        const estado = ((a.estado || "Pendiente") + "").toLowerCase();
+        const estadoClass = estado === "pendiente" ? "estado-pendiente" : "";
+        asesoriaElement.innerHTML=`
+            <div class="asesoria-header">
+                <div class="asesoria-tema">${a.tema || 'Sin tema'}</div>
+                <div class="asesoria-estado ${estadoClass}">${a.estado || 'Pendiente'}</div>
+            </div>
+            <div class="asesoria-detalles">
+                <div class="detalle-item"><span class="detalle-label">Asesoría subida por mí</span></div>
+                <div class="detalle-item"><span class="detalle-label">Estudiante:</span> ${a.estudiantenombre || 'N/A'}</div>
+                <div class="detalle-item"><span class="detalle-label">Categoría:</span> ${a.categorianombre || 'N/A'}</div>
+                <div class="detalle-item"><span class="detalle-label">Fecha:</span> ${a.fechaasesoria ? new Date(a.fechaasesoria).toLocaleString() : 'N/A'}</div>
+                <div class="detalle-item"><span class="detalle-label">Horas Solicitadas:</span> ${a.horassolicitadas || 0}</div>
+            </div>
+            <div class="asesoria-own">Asesoría subida por mí</div>
+        `;
+        container.appendChild(asesoriaElement);
+    });
+}
+
+function abrirModalHistorial(){ document.getElementById('modal-historial').style.display='block'; cargarMisAsesorias(); }
+function cerrarModalHistorial(){ document.getElementById('modal-historial').style.display='none'; }
+
+document.addEventListener('DOMContentLoaded',()=>{
+    cargarAsesorias();
+    document.getElementById('search-input').addEventListener('input',filtrarAsesorias);
+   
+    document.getElementById('cerrar-modal').addEventListener('click',cerrarModalHistorial);
+    window.addEventListener('click',function(event){
+        if(event.target===document.getElementById('modal-historial')) cerrarModalHistorial();
+    });
+});
+</script>
+
+<script>
+async function cargarTotalHoras() {
+    try {
+        const token = localStorage.getItem('token');
+
+        const response = await fetch('/api/transacciones/horas/total', {
+            headers: { 'Authorization': token }
         });
 
-    </script>
-    <script src="../js/user-info.js"></script>
-    <script src="../js/index.js"></script>
+        if (!response.ok) {
+            console.error("❌ Error en respuesta HTTP:", response.status);
+            return;
+        }
+
+        const data = await response.json();
+
+        console.log("✅ Total horas cargado:", data);
+
+        document.getElementById("total-horas").textContent = data.totalHoras;
+    } catch (error) {
+        console.error("Error de conexión al cargar total de horas:", error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    cargarTotalHoras();
+});
+</script>
+
+<script src="../js/user-info.js"></script>
+<script src="../js/index.js"></script>
 </body>
 </html>

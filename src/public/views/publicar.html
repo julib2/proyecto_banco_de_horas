@@ -170,16 +170,13 @@
         }
     </style>
     <script>
-        // Función para obtener el token del localStorage
         function getToken() {
             return localStorage.getItem('token');
         }
 
-        // Función para verificar autenticación
         async function verificarAutenticacion() {
             const token = getToken();
             if (!token) {
-                // Si no hay token, redirigir al login
                 window.location.href = 'login.html';
                 return;
             }
@@ -187,16 +184,19 @@
             try {
                 const response = await fetch('/api/auth/profile', {
                     method: 'GET',
-                    headers: {
-                        'Authorization': token
-                    }
+                    headers: { 'Authorization': token }
                 });
 
                 if (!response.ok) {
-                    // Si el token no es válido, redirigir al login
                     localStorage.removeItem('token');
                     window.location.href = 'login.html';
+                    return;
                 }
+
+                // Verificación exitosa, usuario autenticado
+                const data = await response.json();
+                console.log('Usuario autenticado:', data.user.documento);
+
             } catch (error) {
                 console.error('Error al verificar autenticación:', error);
                 localStorage.removeItem('token');
@@ -205,9 +205,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar autenticación
-            verificarAutenticacion();
-
             const categoriaSelect = document.getElementById('categoria');
             const asignaturaContainer = document.getElementById('asignatura-container');
             const asignaturaSelect = document.getElementById('asignatura');
@@ -218,13 +215,11 @@
             const fechaInput = document.getElementById('fecha');
             const horaInput = document.getElementById('hora');
 
-            // Configurar fecha mínima (hoy)
             const now = new Date();
             const today = now.toISOString().split('T')[0];
             fechaInput.min = today;
 
             categoriaSelect.addEventListener('change', function() {
-                // Ocultar todos los contenedores
                 asignaturaContainer.style.display = 'none';
                 deporteContainer.style.display = 'none';
                 arteContainer.style.display = 'none';
@@ -235,13 +230,13 @@
                 deporteSelect.value = '';
                 arteSelect.value = '';
 
-                if (this.value === '1') { // Asignaturas
+                if (this.value === '1') {
                     asignaturaContainer.style.display = 'block';
                     asignaturaSelect.required = true;
-                } else if (this.value === '2') { // Deportes
+                } else if (this.value === '2') {
                     deporteContainer.style.display = 'block';
                     deporteSelect.required = true;
-                } else if (this.value === '3') { // Arte
+                } else if (this.value === '3') {
                     arteContainer.style.display = 'block';
                     arteSelect.required = true;
                 }
@@ -250,7 +245,6 @@
     </script>
 </head>
 <body>
-    <!-- header -->
     <header class="header-principal">
         <div class="contenedor-logo-header">
             <img src="../images/Logo_pascual.png" alt="Logo Universidad Pascual Bravo" class="logo-header">
@@ -258,16 +252,11 @@
         <div class="titulo-header">
             <h1>Banco de Horas</h1>
         </div>
-        <div class="usuario-info" id="usuario-info">
-            <!-- Información del usuario se cargará aquí -->
-        </div>
+        <div class="usuario-info" id="usuario-info"></div>
     </header>
 
-    <!-- Botón de regresar -->
     <div class="contenedor-boton-regresar">
-        <a href="/views/index.html" class="boton-regresar">
-            ← Regresar
-        </a>
+        <a href="/views/index.html" class="boton-regresar">← Regresar</a>
     </div>
 
     <div class="contenedor-principal">
@@ -276,10 +265,7 @@
                 <h2>Registrar nueva asesoría</h2>
 
                 <div class="fila-campos">
-                    <div class="campo-tercio">
-                        <label for="estudiante" class="inidicadores">Documento del Estudiante:</label>
-                        <input type="text" id="estudiante" class="inputs" name="UsuarioDocumento" required>
-                    </div>
+
                     <div class="campo-tercio">
                         <label for="categoria" class="inidicadores">Categoría:</label>
                         <select id="categoria" name="CategoriaId" class="selector" required>
@@ -287,7 +273,6 @@
                             <option value="1">Asignaturas</option>
                             <option value="2">Deportes</option>
                             <option value="3">Arte</option>
-                            <!-- Puedes llenar dinámicamente desde la base de datos -->
                         </select>
                     </div>
                     <div class="campo-tercio" id="asignatura-container" style="display: none;">
@@ -372,7 +357,6 @@
     </div>
 
     <script>
-        // Función para enviar el formulario
         document.getElementById('form-publicar').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -383,15 +367,39 @@
                 return;
             }
 
+            // Obtener documento del usuario desde el token decodificado
+            function parseJwt (token) {
+                try {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    return JSON.parse(jsonPayload);
+                } catch {
+                    return null;
+                }
+            }
+            const userData = parseJwt(token);
+            if (!userData || !userData.documento) {
+                alert('Token inválido o expirado. Por favor, inicia sesión nuevamente.');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+                return;
+            }
+
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
 
+            // Insertar UsuarioDocumento al data con el documento del usuario actual
+            data.UsuarioDocumento = userData.documento;
+
             try {
-                const response = await fetch('/api/tutorias/registrar-asesoria', {
+                const response = await fetch('/api/asesorias/tutorias/registrar-asesoria', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': token
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(data)
                 });
