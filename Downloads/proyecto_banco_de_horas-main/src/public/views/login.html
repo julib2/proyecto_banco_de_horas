@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco de Horas - Universidad Pascual Bravo</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <!-- fondo de imagen -->
+    <div class="fondo-imagen"></div>
+
+    <div class="contenedor-login">
+        <!-- logo de la universidad -->
+        <div class="contenedor-logo">
+            <img src="../images/Logo_pascual.png" alt="Logo Universidad Pascual Bravo" class="logo">
+        </div>
+
+        <div class="caja-login">
+            <!-- título -->
+            <h1 class="titulo">Banco de Horas</h1>
+
+            <!-- formulario de login -->
+            <form id="formularioLogin" class="formulario-login">
+                <!-- campo de correo -->
+                <div class="campo-correo">
+                    <input type="text" id="correo" placeholder="nombre.apellido" required>
+                    <span class="dominio">@pascual.edu</span>
+                </div>
+
+                <!-- campo de contraseña -->
+                <input type="password" id="contrasena" placeholder="Contraseña (número de documento)" required>
+
+            <!-- botón de iniciar sesión -->
+            <button type="submit" class="boton-login">Iniciar Sesión</button>
+            </form>
+
+            <!-- enlace para registrarse -->
+            <p class="enlace-registro">
+                <a href="register.html">¿No tienes cuenta? Regístrate aquí</a>
+            </p>
+
+            <!-- mensaje de error -->
+            <div id="mensaje" class="mensaje"></div>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat de Asesoría - Banco de Horas</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f0f4f8;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      header {
+        background-color: #75b8ee;
+        padding: 10px 20px;
+        color: white;
+        font-weight: bold;
+        font-size: 24px;
+        text-align: center;
+      }
+      #chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-width: 800px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      }
+      #message-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 20px;
+        border-bottom: 1px solid #eee;
+      }
+      .message {
+        margin-bottom: 15px;
+        max-width: 70%;
+        padding: 10px 15px;
+        border-radius: 15px;
+        clear: both;
+        font-size: 16px;
+        line-height: 1.3;
+      }
+      .message.sender {
+        background: #75b8ee;
+        color: white;
+        float: right;
+        border-bottom-right-radius: 0;
+      }
+      .message.receiver {
+        background: #e1e5e9;
+        color: #333;
+        float: left;
+        border-bottom-left-radius: 0;
+      }
+      #input-area {
+        padding: 10px 20px;
+        display: flex;
+        gap: 10px;
+        background-color: #fafafa;
+        border-radius: 0 0 10px 10px;
+      }
+      #message-input {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        outline: none;
+      }
+      #send-button {
+        background-color: #75b8ee;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+      }
+      #send-button:hover {
+        background-color: #599bd1;
+      }
+      .info {
+        text-align: center;
+        margin-top: 10px;
+        color: #666;
+      }
+    </style>
+</head>
+<body>
+  <header>Chat de Asesoría</header>
+  <div id="chat-container" style="display: flex; flex-direction: row; height: 80vh; position: relative;">
+    
+    <!-- Panel izquierdo -->
+    <div id="left-panel" style="width: 300px; border-right: 1px solid #eee; overflow-y: auto; padding: 20px;">
+        <div id="message-list">
+            <p class="info">Cargando mensajes...</p>
+        </div>
+    </div>
+
+    <!-- Barra de redimensionamiento -->
+    <div id="resize-bar" 
+         style="
+            width: 6px;
+            cursor: ew-resize;
+            background: #cccccc;
+            height: 100%;
+         ">
+    </div>
+
+    <!-- Panel derecho -->
+    <div id="right-panel" style="width: 270px; padding: 20px; background: #f7faff; overflow-y: auto;">
+        <h3>Asesorías</h3>
+        <div id="asesorias-list">
+          <p>Cargando asesorías...</p>
+        </div>
+    </div>
+  </div>
+
+
+  <div id="input-area" style="margin-top: 10px;">
+    <input type="text" id="message-input" placeholder="Escribe un mensaje..." autocomplete="off" />
+    <button id="send-button">Enviar</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    (function() {
+      const socket = io("http://localhost:3000", { transports: ["websocket"] });
+
+
+      const userDocumento = localStorage.getItem('userDocumento');
+      const messageList = document.getElementById('message-list');
+      const messageInput = document.getElementById('message-input');
+      const sendButton = document.getElementById('send-button');
+      const asesoriasListDiv = document.getElementById('asesorias-list');
+
+      let selectedChatId = null;
+      let receiverDocumento = null;
+
+      // Unirse a una sala chat según el chatId seleccionado
+      function joinChat(chatId) {
+        if (selectedChatId) {
+          socket.emit('leaveChat', { chatId: selectedChatId });
+        }
+        selectedChatId = chatId;
+        socket.emit('joinChat', { chatId });
+        loadMessages();
+      }
+
+      // Cargar asesorías donde el usuario es tutor o estudiante para mostrar en la lista derecha
+      async function loadAsesorias() {
+        try {
+          const response = await fetch('/api/asesorias/tutorias/mis-tutorias', {
+            headers: { Authorization: localStorage.getItem('token') }
+          });
+          if (response.ok) {
+            const asesorias = await response.json();
+            asesoriasListDiv.innerHTML = '';
+            asesorias.forEach(asesoria => {
+              const chatId = asesoria.id;
+              const isTutor = asesoria.tutordocumento === userDocumento;
+              const isEstudiante = asesoria.estudiantedocumento === userDocumento;
+
+              if (isTutor || isEstudiante) {
+                const otherUser = isTutor ? asesoria.estudiantedocumento : asesoria.tutordocumento;
+                const displayName = isTutor ? asesoria.estudiantenombre : asesoria.tutornombre;
+
+                const asesoriaDiv = document.createElement('div');
+                asesoriaDiv.textContent = `${asesoria.tema || 'Sin tema'} - ${displayName}`;
+                asesoriaDiv.style.cursor = 'pointer';
+                asesoriaDiv.style.padding = '8px';
+                asesoriaDiv.style.borderBottom = '1px solid #ccc';
+                asesoriaDiv.onclick = () => {
+                  receiverDocumento = otherUser;
+                  joinChat(chatId);
+                };
+                asesoriasListDiv.appendChild(asesoriaDiv);
+              }
+            });
+
+            if (asesorias.length === 0) {
+              asesoriasListDiv.innerHTML = '<p>No tienes asesorías para chatear.</p>';
+            }
+          } else {
+            asesoriasListDiv.innerHTML = '<p>Error cargando asesorías.</p>';
+          }
+        } catch (error) {
+          asesoriasListDiv.innerHTML = '<p>Error de conexión.</p>';
+        }
+      }
+
+      // Recibir mensajes desde el servidor
+      socket.on('receiveMessage', (msg) => {
+        if (msg.chatId !== selectedChatId) return;
+        appendMessage(msg);
+      });
+
+      // Mostrar mensajes previos al cargar
+      async function loadMessages() {
+        if (!selectedChatId) {
+          messageList.innerHTML = '<p class="info">Selecciona una asesoría a la derecha para iniciar el chat.</p>';
+          return;
+        }
+        try {
+          const response = await fetch(`/api/mensajes?chatId=${selectedChatId}`, {
+            headers: { Authorization: localStorage.getItem('token') }
+          });
+          if (response.ok) {
+            const messages = await response.json();
+            messageList.innerHTML = '';
+            messages.forEach(appendMessage);
+            scrollToBottom();
+          } else {
+            messageList.innerHTML = '<p class="info">No se pudieron cargar los mensajes.</p>';
+          }
+        } catch (error) {
+          messageList.innerHTML = '<p class="info">Error de conexión al cargar mensajes.</p>';
+        }
+      }
+
+      // Función para mostrar un mensaje en el chat
+      function appendMessage(msg) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message ' + (msg.sender === userDocumento ? 'sender' : 'receiver');
+        const date = new Date(msg.fechaHora || msg.FechaHora);
+        const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        msgDiv.innerHTML = `<div>${msg.content || msg.Contenido}</div><small>${formattedTime}</small>`;
+        messageList.appendChild(msgDiv);
+        scrollToBottom();
+      }
+
+      // Enviar mensaje al servidor
+      function sendMessage() {
+        const content = messageInput.value.trim();
+        if (!content || !selectedChatId || !receiverDocumento) return;
+        socket.emit('sendMessage', {
+          chatId: selectedChatId,
+          sender: userDocumento,
+          receiver: receiverDocumento,
+          content
+        });
+        messageInput.value = '';
+      }
+
+      sendButton.addEventListener('click', sendMessage);
+      messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+      function scrollToBottom() {
+        messageList.scrollTop = messageList.scrollHeight;
+      }
+
+      loadAsesorias();
+
+    })();
+  </script>
+</body>
+</html>

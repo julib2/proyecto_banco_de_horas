@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesorías Disponibles - Banco de Horas</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        /* caja centro para el listado */
+        .caja-centro {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 60vh;
+            padding: 5px;
+            border-radius: 25px;
+            margin: 0px 0px 50px 0px;
+            border: 5px solid #75b8ee;
+            background: transparent;
+            width: 90vw;
+            position: relative;
+        }
+
+        .listado-asesorias {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 100%;
+            max-height: 70vh;
+            overflow-y: auto;
+            animation: fadeIn 0.5s ease-in-out;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+        }
+
+        .search-container {
+            width: 100%;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            border: 2px solid #75b8ee;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #599bd1;
+        }
+
+        .listado-asesorias h2 {
+            font-size: 28px;
+            color: #061451;
+            margin-bottom: 30px;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+        }
+
+        .asesoria-item {
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+            background: #f9f9f9;
+            transition: box-shadow 0.3s ease;
+            flex: 0 0 300px;
+            min-width: 250px;
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+
+        .asesoria-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .asesoria-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .asesoria-tema {
+            font-size: 20px;
+            font-weight: bold;
+            color: #061451;
+        }
+
+        .asesoria-estado {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .estado-pendiente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .asesoria-detalles {
+            margin-bottom: 15px;
+        }
+
+        .detalle-item {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .detalle-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .asesoria-descripcion {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .asesoria-acciones {
+            text-align: right;
+        }
+
+        .boton-accion {
+            background: linear-gradient(135deg, #599bd1 0%, #75b8ee 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-left: 10px;
+        }
+
+        .boton-accion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .contenedor-boton-regresar {
+            margin: 10px 30px 0px 30px;
+            text-align: left;
+        }
+
+        .boton-regresar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #061451;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 15px;
+            border: 2px solid #061451;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .boton-regresar:hover {
+            background: #061451;
+            color: white;
+            transform: translateX(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .no-asesorias {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            padding: 40px;
+        }
+
+        #asesorias-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .asesoria-own {
+            text-align: center;
+            font-weight: bold;
+            color: #3a8cfe;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; max-width: 600px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+<header class="header-principal">
+    <div class="contenedor-logo-header">
+        <img src="../images/Logo_pascual.png" alt="Logo Universidad Pascual Bravo" class="logo-header">
+    </div>
+    <div class="titulo-header">
+        <h1>Banco de Horas</h1>
+    </div>
+   
+    <div class="usuario-info" id="usuario-info"></div>
+</header>
+
+<div class="contenedor-boton-regresar">
+    <a href="/views/index.html" class="boton-regresar">← Regresar</a>
+</div>
+
+<div class="contenedor-principal">
+    <div class="caja-centro">
+        <div class="listado-asesorias">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 30px;">
+                <h2>Asesorías Disponibles</h2>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Buscar por tema, estudiante o categoría...">
+            </div>
+            <div id="asesorias-container">
+                <p class="no-asesorias">Cargando asesorías...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-historial" class="modal">
+    <div class="modal-content">
+        <span class="close" id="cerrar-modal">&times;</span>
+        <h2>Mis Asesorías</h2>
+        <div id="contenido-historial"></div>
+    </div>
+</div>
+
+<script>
+let currentUserDocumento = localStorage.getItem('userDocumento');
+if (!currentUserDocumento) {
+    const token = localStorage.getItem('token');
+    if (token) {
+        try { const payload = JSON.parse(atob(token.split('.')[1])); currentUserDocumento = payload.documento; }
+        catch (e) { console.error('Error decodificando token:', e); }
+    }
+}
+
+function normalizarAsesoria(a) {
+    return {
+        id: a.id,
+        usuarioDocumento: a.usuariodocumento,
+        tutorDocumento: a.tutordocumento,
+        categoriaId: a.categoriaid,
+        categoriaNombre: a.categorianombre || 'Sin categoría', // fallback
+        fechaAsesoria: a.fechaasesoria ? new Date(a.fechaasesoria).toLocaleString() : 'Fecha no disponible', // parse date
+        horasSolicitadas: a.horassolicitadas,
+        estado: a.estado,
+        tema: a.tema,
+        estudiantenombre: a.estudiantenombre,
+        tutornombre: a.tutornombre
+    };
+}
+
+async function cargarAsesorias() {
+    try {
+            const response = await fetch('/api/asesorias/tutorias/pendientes', {
+                headers: { 'Authorization': localStorage.getItem('token') }
+            });
+        if (response.ok) {
+        const asesoriasJson = await response.json();
+
+        // Debug log to check received asesorias data
+        console.log('Received asesorias:', asesoriasJson);
+
+        mostrarAsesorias(asesoriasJson.map(normalizarAsesoria));
+        } else {
+            console.error('Error al cargar asesorías:', response.statusText);
+            document.getElementById('asesorias-container').innerHTML = '<p class="no-asesorias">Error al cargar las asesorías. Inténtalo de nuevo más tarde.</p>';
+        }
+    } catch (error) {
+        console.error('Error de red:', error);
+        document.getElementById('asesorias-container').innerHTML = '<p class="no-asesorias">Error de conexión. Verifica tu conexión a internet.</p>';
+    }
+}
+
+function mostrarAsesorias(asesorias) {
+    const container = document.getElementById('asesorias-container');
+    if (asesorias.length === 0) { container.innerHTML = '<p class="no-asesorias">No hay asesorías pendientes disponibles en este momento.</p>'; return; }
+    container.innerHTML = '';
+    asesorias.forEach(a => {
+        const asesoriaElement = document.createElement('div');
+        asesoriaElement.className = 'asesoria-item';
+        const estado = ((a.estado || "Pendiente") + "").toLowerCase();
+        const estadoClass = estado === "pendiente" ? "estado-pendiente" : "";
+        const isOwn = a.usuarioDocumento === currentUserDocumento;
+
+        asesoriaElement.innerHTML = `
+            <div class="asesoria-header">
+                <div class="asesoria-tema">${a.tema || 'Sin tema'}</div>
+                <div class="asesoria-estado ${estadoClass}">${a.estado || 'Pendiente'}</div>
+            </div>
+            <div class="asesoria-detalles">
+            ${isOwn ? `<div class="detalle-item"><span class="detalle-label">Asesoría subida por mí</span></div>` : `<div class="detalle-item"><span class="detalle-label">Tutor:</span> ${a.tutornombre || 'N/A'}</div>`}
+            <div class="detalle-item"><span class="detalle-label">Categoría:</span> ${a.categoriaNombre}</div>
+            <div class="detalle-item"><span class="detalle-label">Fecha:</span> ${a.fechaAsesoria}</div>
+            <div class="detalle-item"><span class="detalle-label">Horas Solicitadas:</span> ${a.horasSolicitadas}</div>
+        </div>
+        <div class="asesoria-descripcion">${a.tema || ''}</div>
+        ${isOwn ? `<div class="asesoria-own">Asesoría subida por mí</div>` : `<div class="asesoria-acciones">
+            <button class="boton-accion" onclick="confirmarAsesoria(${a.id})">Solicitar</button>
+        </div>`}
+        `;
+        container.appendChild(asesoriaElement);
+    });
+}
+
+async function confirmarAsesoria(id) {
+    if(confirm('¿Estás seguro de que quieres confirmar esta asesoría?')){
+        try{
+            const response = await fetch(`/api/asesorias/tutorias/${id}/confirmar`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('token')
+                }
+            });
+            if(response.ok){ alert('Asesoría confirmada exitosamente.'); cargarAsesorias(); }
+            else alert('Error al confirmar la asesoría.');
+        }catch(e){ console.error(e); alert('Error de conexión.'); }
+    }
+}
+
+async function rechazarAsesoria(id) {
+    if(confirm('¿Estás seguro de que quieres rechazar esta asesoría?')){
+        try{
+            const response = await fetch(`/api/asesorias/tutorias/${id}/rechazar`, {
+                method:'PUT',
+                headers: {
+                    'Content-Type':'application/json',
+                    'Authorization': localStorage.getItem('token')
+                }
+            });
+            if(response.ok){ alert('Asesoría rechazada.'); cargarAsesorias(); }
+            else alert('Error al rechazar la asesoría.');
+        }catch(e){ console.error(e); alert('Error de conexión.'); }
+    }
+}
+
+function filtrarAsesorias() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const asesorias = document.querySelectorAll('.asesoria-item');
+    asesorias.forEach(a => {
+        const tema = a.querySelector('.asesoria-tema').textContent.toLowerCase();
+        const estudiante = a.querySelector('.detalle-item:nth-child(1)').textContent.toLowerCase();
+        const categoria = a.querySelector('.detalle-item:nth-child(2)').textContent.toLowerCase();
+        a.style.display = (tema.includes(searchTerm) || estudiante.includes(searchTerm) || categoria.includes(searchTerm)) ? 'block':'none';
+    });
+}
+
+async function cargarMisAsesorias() {
+    const token = localStorage.getItem('token');
+    if(!token){ alert('No hay token de autenticación. Inicia sesión nuevamente.'); window.location.href='login.html'; return; }
+    try{
+        const response = await fetch('/api/asesorias/tutorias/mis-tutorias', {
+            method: 'GET',
+            headers: {'Authorization': token}
+        });
+        if(response.ok){ mostrarMisAsesorias(await response.json()); }
+        else{ console.error('Error al cargar mis asesorías'); document.getElementById('asesorias-container').innerHTML='<p class="no-asesorias">Error al cargar tus asesorías.</p>'; }
+    }catch(e){ console.error(e); document.getElementById('asesorias-container').innerHTML='<p class="no-asesorias">Error de conexión.</p>'; }
+}
+
+function mostrarMisAsesorias(asesorias){
+    const container = document.getElementById('contenido-historial');
+    if(asesorias.length===0){ container.innerHTML='<p class="no-asesorias">No tienes asesorías registradas.</p>'; return; }
+    container.innerHTML='';
+    asesorias.forEach(a=>{
+        const asesoriaElement = document.createElement('div');
+        asesoriaElement.className='asesoria-item';
+        const estado = ((a.estado || "Pendiente") + "").toLowerCase();
+        const estadoClass = estado === "pendiente" ? "estado-pendiente" : "";
+        asesoriaElement.innerHTML=`
+            <div class="asesoria-header">
+                <div class="asesoria-tema">${a.tema || 'Sin tema'}</div>
+                <div class="asesoria-estado ${estadoClass}">${a.estado || 'Pendiente'}</div>
+            </div>
+            <div class="asesoria-detalles">
+                <div class="detalle-item"><span class="detalle-label">Asesoría subida por mí</span></div>
+                <div class="detalle-item"><span class="detalle-label">Estudiante:</span> ${a.estudiantenombre || 'N/A'}</div>
+                <div class="detalle-item"><span class="detalle-label">Categoría:</span> ${a.categorianombre || 'N/A'}</div>
+                <div class="detalle-item"><span class="detalle-label">Fecha:</span> ${a.fechaasesoria ? new Date(a.fechaasesoria).toLocaleString() : 'N/A'}</div>
+                <div class="detalle-item"><span class="detalle-label">Horas Solicitadas:</span> ${a.horassolicitadas || 0}</div>
+            </div>
+            <div class="asesoria-own">Asesoría subida por mí</div>
+        `;
+        container.appendChild(asesoriaElement);
+    });
+}
+
+function abrirModalHistorial(){ document.getElementById('modal-historial').style.display='block'; cargarMisAsesorias(); }
+function cerrarModalHistorial(){ document.getElementById('modal-historial').style.display='none'; }
+
+document.addEventListener('DOMContentLoaded',()=>{
+    cargarAsesorias();
+    document.getElementById('search-input').addEventListener('input',filtrarAsesorias);
+   
+    document.getElementById('cerrar-modal').addEventListener('click',cerrarModalHistorial);
+    window.addEventListener('click',function(event){
+        if(event.target===document.getElementById('modal-historial')) cerrarModalHistorial();
+    });
+});
+</script>
+
+<script>
+async function cargarTotalHoras() {
+    try {
+        const token = localStorage.getItem('token');
+
+        const response = await fetch('/api/transacciones/horas/total', {
+            headers: { 'Authorization': token }
+        });
+
+        if (!response.ok) {
+            console.error("❌ Error en respuesta HTTP:", response.status);
+            return;
+        }
+
+        const data = await response.json();
+
+        console.log("✅ Total horas cargado:", data);
+
+        document.getElementById("total-horas").textContent = data.totalHoras;
+    } catch (error) {
+        console.error("Error de conexión al cargar total de horas:", error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    cargarTotalHoras();
+});
+</script>
+
+<script src="../js/user-info.js"></script>
+<script src="../js/index.js"></script>
+</body>
+</html>

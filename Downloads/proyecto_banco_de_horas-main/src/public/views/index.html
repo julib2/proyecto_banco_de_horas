@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco de Horas - Universidad Pascual Bravo</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <!-- header -->
+    <header class="header-principal">
+        <div class="contenedor-logo-header">
+            <img src="../images/Logo_pascual.png" alt="Logo Universidad Pascual Bravo" class="logo-header">
+        </div>
+        <div class="titulo-header">
+            <h1>Banco de Horas</h1>
+        </div>
+        
+        <div class="usuario-info" id="usuario-info"></div>
+    </header>
+
+    <div class="contenedor-principal">
+        <h1 class="titulo-principal">Bienvenido al Banco de Horas</h1>
+
+        <div class="opciones-principales">
+            <div class="opcion-card" id="ver-ofertas">
+                <div class="icono-opcion">
+                    <img src="../images/ofertatutor.png" alt="Ver Ofertas" class="icono">
+                </div>
+                <h2 class="titulo-opcion">Ver Ofertas de Tutorías</h2>
+                <p class="descripcion-opcion">Explora las tutorías disponibles y encuentra ayuda en las materias que necesitas.</p>
+            </div>
+
+            <div class="opcion-card" id="publicar-tutoria">
+                <div class="icono-opcion">
+                    <img src="../images/publicartutoria.png" alt="Publicar Tutoría" class="icono">
+                </div>
+                <h2 class="titulo-opcion">Publicar una Tutoría</h2>
+                <p class="descripcion-opcion">Ofrece tus conocimientos y gana horas ayudando a otros estudiantes.</p>
+            </div>
+        </div>
+
+        <div class="navegacion-secundaria">
+            <a href="perfil.html" class="enlace-secundario">Mi Perfil</a>
+            <button id="historial-horas" class="enlace-secundario">Historial de Tutorías</button>
+            <button id="btn-historial-horas" class="enlace-secundario">Historial de Horas</button>
+            <a href="chat.html" class="enlace-secundario">Chat</button>
+        <a href="login.html" class="enlace-secundario">Cerrar Sesión</a>
+        </div>
+
+        <!-- Modal Historial Tutorías -->
+        <div id="modal-historial" class="modal">
+            <div class="modal-content">
+                <span class="close" id="cerrar-modal">&times;</span>
+                <h2>Historial de Tutorías</h2>
+                <div class="botones-historial">
+                    <button id="btn-mis-tutorias" class="boton-historial">Mis Tutorías</button>
+                    <button id="btn-tutorias-tomadas" class="boton-historial">Tutorías Tomadas</button>
+                </div>
+                <div id="contenido-historial" class="contenido-historial"></div>
+            </div>
+        </div>
+
+        <!-- Modal Historial Horas -->
+        <div id="modal-horas" class="modal">
+            <div class="modal-content">
+                <span class="close" id="cerrar-modal-horas">&times;</span>
+                <h2>Historial de Horas</h2>
+                <div id="contenido-horas" class="contenido-historial"></div>
+            </div>
+        </div>
+
+        <!-- Modal Chat -->
+        <div id="modal-chat" class="modal">
+            <div class="modal-content">
+                <span class="close" id="cerrar-modal-chat">&times;</span>
+                <h2>Chat</h2>
+                <div id="chat-mensajes" class="contenido-historial"></div>
+                <textarea id="mensaje-texto" placeholder="Escribe tu mensaje..."></textarea>
+                <button id="enviar-mensaje">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+async function cargarTotalHoras() {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            document.getElementById('total-horas').textContent = '0';
+            return;
+        }
+        const res = await fetch('/api/horas/total', {
+            headers: {
+                'Authorization': token
+            }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            document.getElementById('total-horas').textContent = data.totalHoras || 0;
+        } else {
+            console.error('Error cargando total de horas');
+            document.getElementById('total-horas').textContent = '0';
+        }
+    } catch (error) {
+        console.error('Error de conexión al cargar total de horas:', error);
+        document.getElementById('total-horas').textContent = '0';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    cargarTotalHoras();
+});
+</script>
+<script src="../js/index.js"></script>
+</body>
+</html>

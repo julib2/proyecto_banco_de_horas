@@ -1,0 +1,36 @@
+Resumen de la base de datos relevante para la implementación del chat en tiempo real:
+
+Tablas principales implicadas:
+
+1. Mensaje:
+   - Id: Integer, PK
+   - Fk_Usuario: Varchar(20), usuario que envía el mensaje
+   - FechaHora: Timestamp con zona horaria, default CURRENT_TIMESTAMP
+   - Contenido: Text, contenido del mensaje
+   - UsuarioReceptor: Varchar(20), usuario receptor del mensaje
+   - Leido: Boolean, default false, indica si el mensaje fue leído
+   - ChatId: Integer, posible campo para agrupar mensajes en chats específicos (no explicado completamente)
+
+2. Usuario:
+   - Documento: Varchar(20), PK
+   - Nombre: Varchar(100)
+   - Correo: Varchar(100)
+   - Contraseña: Varchar(100)
+   - CantidadHoras: Integer
+
+3. Asesoria:
+   - Id: Integer, PK
+   - EstudianteDocumento: Varchar(20), FK a Usuario
+   - TutorDocumento: Varchar(20), FK a Usuario
+   - CategoriaId: Integer
+   - FechaSolicitud: Timestamp con zona horaria, default CURRENT_TIMESTAMP
+   - FechaAsesoria: Timestamp con zona horaria
+   - HorasSolicitadas: Integer
+   - Estado: Varchar(50), default 'Pendiente'
+   - Tema: Varchar(255)
+
+Consideraciones:
+- El chat entre estudiante y tutor debe basarse en la tabla Mensaje, vinculando emisor (Fk_Usuario) y receptor (UsuarioReceptor).
+- Se puede usar el campo ChatId para organizar mensajes por conversaciones, o implementar lógica para filtrar mensajes por pares (emisor, receptor).
+- Se requiere añadir rutas API para enviar y recibir mensajes en tiempo real.
+- Se requiere implementar mecanismos de comunicación en tiempo real (WebSocket o Socket.IO).
